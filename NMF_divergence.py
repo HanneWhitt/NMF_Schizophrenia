@@ -5,6 +5,7 @@ import os
 import inspect
 
 # NMF notation: V ~ WH where V is n x m, W is n x r, H is r x m
+# Implemetning divergence-based multiplicative updates algorithm from Lee and Seung, Algorithms for Non-negative Matrix Factorization (2001)
 
 # A function to prevent zero-division errors by replacing anything rounded to zero with the smallest number numpy can handle
 
