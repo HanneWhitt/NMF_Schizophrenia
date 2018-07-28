@@ -114,7 +114,6 @@ plt.show()
 X_gene_stats = X_gene_stats[X_gene_stats['% SPARSITY'] < maximum_acceptable_sparsity]
 X_gene_stats = X_gene_stats.sort_values('% SPARSITY')
 
-
 # Replotting CoV Histogram
 
 plt.clf()
