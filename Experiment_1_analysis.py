@@ -49,6 +49,8 @@ for repeat in repeats:
 #
 #
 final_div_real = final_divergences.iloc[:, final_divergences.columns.get_level_values(1)=='Real Data']
+
+
 final_div_permuted = final_divergences.iloc[:, final_divergences.columns.get_level_values(1)=='Permuted']
 
 # best_repeats_by_rank = final_div_real.idxmin()

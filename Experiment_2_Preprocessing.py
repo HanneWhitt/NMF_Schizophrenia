@@ -35,10 +35,8 @@ data_path = "C:/Users/hanne/Documents/PROJECT/Project Data/"
 figures_path = "C:/Users/hanne/Documents/PROJECT/Figures/Experiment_2/"
 
 X_CM = pd.read_csv(data_path + "CM_matrix.csv", index_col=0)
-X_CM = X_CM[(X_CM != 0).any(1)]
 
 X_LI = pd.read_csv(data_path + "LI_matrix.csv", index_col=0)
-X_LI = X_LI[(X_LI != 0).any(1)]
 
 CM_patients = list(X_CM.columns)
 LI_patients = list(X_LI.columns)
@@ -117,6 +115,10 @@ def preprocess(data_matrix, sparsity_cut_off, floor_threshold):
     # Removing genes by sparsity
     gene_stats = pd.DataFrame()
     gene_stats['% SPARSITY'] = 100*(data_matrix == 0).astype(int).sum(axis=1)/m_patients
+
+    print(gene_stats[gene_stats['% SPARSITY']  < sparsity_cut_off].sort_values('% SPARSITY'))
+    input()
+
     data_matrix = data_matrix[gene_stats['% SPARSITY'] < sparsity_cut_off]
 
     print('Removed genes with more than {}% zero values. {} of {} genes remaining'.format(sparsity_cut_off,
@@ -139,6 +141,12 @@ def preprocess(data_matrix, sparsity_cut_off, floor_threshold):
 
 CM_preprocessed = preprocess(X_CM, 30, 2**-10)
 LI_preprocessed = preprocess(X_LI, 30, 2**-10)
+
+CM_preprocessed.to_csv(data_path + 'CM_experiment_2_data.csv')
+LI_preprocessed.to_csv(data_path + 'LI_experiment_2_data.csv')
+
+
+
 
 
 

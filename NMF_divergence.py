@@ -18,32 +18,32 @@ def make_safe(M):
 
 # Defining divergence loss (not strictly KL, but reduces to KL when matrices normalised to valid probability distribution - see Lee and Seung)
 
-def D(V_real, V_approx): # V_true, V_approx are any two matrices (np arrays) of the same dimensions
+def D(V_real, V_approx):  # V_true, V_approx are any two matrices (np arrays) of the same dimensions
 
     V_real_dim = V_real.shape
     V_approx_dim = V_approx.shape
-    assert V_real_dim == V_approx_dim, "Input matrix dimensions do not match"
+    assert V_real_dim == V_approx_dim, "Input matrix dimensions do not match: {} vs {}".format(V_real_dim, V_approx_dim)
 
     V_real_safe = make_safe(V_real)
     V_approx_safe = make_safe(V_approx)
 
     # Log of division is re-expressed as difference of logs to avoid overflows from division
-    divergence = np.sum(np.multiply(V_real_safe, np.log(V_real_safe) - np.log(V_approx_safe)) - V_real_safe + V_approx_safe)
+    divergence = np.sum(
+        np.multiply(V_real_safe, np.log(V_real_safe) - np.log(V_approx_safe)) - V_real_safe + V_approx_safe)
 
     return divergence
 
 
 # Defining divergence update rules from Lee and Seung 2001
 
-def W_update(Vw, Ww, Hw, n, m, r, print_progress = False):
-
+def W_update(Vw, Ww, Hw, n, m, r):
     assert Vw.shape == (n, m) and Ww.shape == (n, r) and Hw.shape == (r, m), "Matrix dimensions wrong"
 
     WHw = make_safe(np.matmul(Ww, Hw))
     divw = np.divide(Vw, WHw)
-    
+
     numeratorw = np.matmul(divw, np.transpose(Hw))
-    denominatorw =  np.matmul(np.ones((n, m)), np.transpose(Hw))
+    denominatorw = np.matmul(np.ones((n, m)), np.transpose(Hw))
 
     denominatorw = make_safe(denominatorw)
     fractionw = np.divide(numeratorw, denominatorw)
@@ -51,8 +51,7 @@ def W_update(Vw, Ww, Hw, n, m, r, print_progress = False):
     return np.multiply(Ww, fractionw)
 
 
-def H_update(Vh, Wh, Hh, n, m, r, print_progress = False):
-
+def H_update(Vh, Wh, Hh, n, m, r):
     assert Vh.shape == (n, m) and Wh.shape == (n, r) and Hh.shape == (r, m), "Matrix dimensions wrong"
 
     WHh = make_safe(np.matmul(Wh, Hh))
@@ -67,51 +66,61 @@ def H_update(Vh, Wh, Hh, n, m, r, print_progress = False):
     return np.multiply(Hh, fraction)
 
 
+from matplotlib import pyplot as plt
+
 
 # Carrying out NMF
 
-def NMF_divergence(V_true, W_init, H_init, n, m, r, iterations, record_D_every_x_iterations = None, report_progress = False):
-
+def NMF_divergence(V_true, W_init, H_init, n, m, r, max_iterations, record_D_every_x_iterations=10,
+                   report_progress=False, save_progress_to=None):
     W = W_init
     H = H_init
     del W_init, H_init
 
-    V_reconstruct = np.matmul(W, H)
-    div = D(V_true.copy(), V_reconstruct)
-    divergence_by_it = [div]
+    divergence_by_it = []
 
-    for it in range(iterations):
+    for it in range(max_iterations):
 
-        start_time = time.time()
+        if it % record_D_every_x_iterations == 0:
 
-        W = W_update(V_true, W, H, n, m, r)
-        H = H_update(V_true, W, H, n, m, r)
+            V_reconstruct = np.matmul(W, H)
 
-        time_for_it = time.time() - start_time
+            div = D(V_true.copy(), V_reconstruct)
 
-        if record_D_every_x_iterations != None:
-            if (it + 1) % record_D_every_x_iterations == 0:
+            divergence_by_it.append([it, div])
 
-                V_reconstruct = np.matmul(W, H)
+            if save_progress_to != None:
 
-                div = D(V_true.copy(), V_reconstruct)
+                # if count % 10 == 0:
+                # H_10 = np.zeros([10, r, m])
+                np.save(save_progress_to + 'H_r={}_it={}.npy'.format(r, it), H)
+                if (it / record_D_every_x_iterations) % 10 == 0:
+                    np.save(save_progress_to + 'W_r={}_it={}.npy'.format(r, it), W[:, :3])
 
-                divergence_by_it.append(div)
+            start_time = time.time()
 
-                if report_progress:
-                    print('Iteration {}/{} complete, divergence = {}'.format(it + 1, iterations, div))
-                    print('Time taken for this iteration: {}s'.format(time_for_it), '\n')
+            W = W_update(V_true, W, H, n, m, r)
+            H = H_update(V_true, W, H, n, m, r)
 
-    divergence_by_it = np.array(divergence_by_it)
+            time_for_it = time.time() - start_time
 
+            if report_progress:
+                print('Iteration {}/{} complete, divergence = {}'.format(it + 1, max_iterations, div))
+                print('Time taken for this iteration: {}s'.format(time_for_it), '\n')
+
+        else:
+
+            W = W_update(V_true, W, H, n, m, r)
+            H = H_update(V_true, W, H, n, m, r)
+
+    divergence_by_it = pd.DataFrame(divergence_by_it).set_index(0)
     return W, H, divergence_by_it
 
 
 # A function to format and save results to CSVs
 
-def save_results(main_results_folder, W, H, unique_name = '', additional_data_name_to_array_dict = {},
-                 row_names_list = None, column_names_list = None):
-
+def save_results(main_results_folder, W, H, unique_name='', additional_data_name_to_array_dict={},
+                 row_names_list=None, column_names_list=None):
     if unique_name == '':
         timestr = time.strftime("%Y%m%d-%H%M%S")
         frm = inspect.stack()[1]

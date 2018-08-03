@@ -71,7 +71,7 @@ def check_NMF_reconstruction(V_test, W_init, H_init, n, m, r, iterations):
 
     # Carrying out NMF using scikit-learn
     sk_start = time.time()
-    model = sklearn_NMF(n_components=r, max_iter=iterations, tol=1e-100, verbose=False, init='custom', solver='mu',
+    model = sklearn_NMF(n_components=r, max_iter=iterations, tol=0, verbose=False, init='custom', solver='mu',
                         beta_loss='kullback-leibler')
     W_sklearn = model.fit_transform(V_test, W=W_init, H=H_init)
     H_sklearn = model.components_
@@ -114,7 +114,7 @@ for n in range(2, n_m_max + 1):
             full_results = full_results.append(results)
 
 
-full_results.to_csv(results_folder + 'full_results.csv')
+#full_results.to_csv(results_folder + 'full_results.csv')
 
 overall_average_relative_reconstruction_error_pc = full_results['MEAN REL PC'].mean()
 print('overall_average_relative_reconstruction_error_pc ', overall_average_relative_reconstruction_error_pc)
