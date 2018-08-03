@@ -92,7 +92,7 @@ def NNDSVDa_initialization(X, n, m, r, report_progress = True):
     if report_progress:
         print('\nNNDSVDa - replacing zeroes with average')
 
-    X_average = np.average(V_dummy)
+    X_average = np.average(X)
 
     W_init = W_init + np.array([W_init == 0]) * X_average
     H_init = H_init + np.array([H_init == 0]) * X_average
@@ -111,7 +111,7 @@ def NNDSVDar_initialization(X, n, m, r, report_progress = True, random_seed = 42
     if report_progress:
         print('\nNNDSVDar - replacing zeroes with uniform randoms in range [0, AVERAGE/100]')
 
-    X_average = np.average(V_dummy)
+    X_average = np.average(X)
 
     random_state = np.random.RandomState(random_seed)
     W_rand = random_state.uniform(0.0, X_average/100, (n, r))
@@ -129,10 +129,9 @@ def NNDSVDar_initialization(X, n, m, r, report_progress = True, random_seed = 42
 
 
 
-# Testing
+# Testing on some previously studied matrices of integers
 
 if __name__ == "__main__":
-
 
     # A W matrix featuring orthogonal basis vectors
     W_dummy = np.array([[1., 0.],
@@ -191,3 +190,26 @@ if __name__ == "__main__":
     W_init, H_init = NNDSVD_initialization(V_dummy,  10, 10, 9)
     W_init_a, H_init_a = NNDSVDa_initialization(V_dummy,  10, 10, 9)
     W_init_ar, H_init_ar = NNDSVDar_initialization(V_dummy,  10, 10, 9)
+
+    print('NNDSVD Initialization W')
+    print(W_init)
+    print(W_init.shape)
+    print('NNDSVD Initialization H')
+    print(H_init)
+    print(H_init.shape)
+
+    print('NNDSVDa Initialization W')
+    print(W_init_a)
+    print(W_init_a.shape)
+
+    print('NNDSVDa Initialization H')
+    print(H_init_a)
+    print(H_init_a.shape)
+
+    print('NNDSVDar Initialization W')
+    print(W_init_ar)
+    print(W_init_ar.shape)
+
+    print('NNDSVDar Initialization H')
+    print(H_init_ar)
+    print(H_init_ar.shape)
