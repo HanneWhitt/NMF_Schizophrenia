@@ -17,7 +17,7 @@ patients = list(data_matrix.columns)
 n = len(genes)
 m = len(patients)
 ranks = [5, 10, 20, 50, 100]
-iterations = 3
+iterations = 5000
 
 data_matrix = np.array(data_matrix)
 
@@ -33,12 +33,10 @@ def experiment_2b(W_init, H_init, results_folder):
 
     for r in ranks:
 
-        random = np.random.RandomState(42)
+        W_init_r = W_init[:, :r]
+        H_init_r = H_init[:r, :]
 
-        W_init = random.uniform(0, 1, (n, r))
-        H_init = random.uniform(0, 1, (r, m))
-
-        W, H, divergence_by_it = NMF_divergence(data_matrix, W_init, H_init, n, m, r, iterations, 1,
+        W, H, divergence_by_it = NMF_divergence(data_matrix, W_init_r, H_init_r, n, m, r, iterations, 1,
                                                 report_progress=True,
                                                 save_progress_to=results_folder)
 
@@ -50,3 +48,4 @@ experiment_2b(W_init_a, H_init_a, results_folder_a)
 
 W_init_ar, H_init_ar = NNDSVDar_initialization(data_matrix, n, m, max(ranks))
 experiment_2b(W_init_ar, H_init_ar, results_folder_ar)
+

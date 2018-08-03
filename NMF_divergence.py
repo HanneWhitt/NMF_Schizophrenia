@@ -105,7 +105,7 @@ def NMF_divergence(V_true, W_init, H_init, n, m, r, max_iterations, record_D_eve
             time_for_it = time.time() - start_time
 
             if report_progress:
-                print('Iteration {}/{} complete, divergence = {}'.format(it + 1, max_iterations, div))
+                print('Rank {}, Iteration {}/{} complete, divergence = {}'.format(r, it + 1, max_iterations, div))
                 print('Time taken for this iteration: {}s'.format(time_for_it), '\n')
 
         else:

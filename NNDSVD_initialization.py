@@ -29,7 +29,7 @@ def NNDSVD_initialization(X, n, m, r, report_progress = True):
 
     # Singular Value Decomposition
     if report_progress:
-        print('NNDSVD INITIALISATION\n\nCalculating SVD...')
+        print('\n\nNNDSVD INITIALISATION\n\nCalculating SVD...')
 
     U, S, VT = np.linalg.svd(X)
 
