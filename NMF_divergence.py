@@ -91,8 +91,6 @@ def NMF_divergence(V_true, W_init, H_init, n, m, r, max_iterations, record_D_eve
 
             if save_progress_to != None:
 
-                # if count % 10 == 0:
-                # H_10 = np.zeros([10, r, m])
                 np.save(save_progress_to + 'H_r={}_it={}.npy'.format(r, it), H)
                 if (it / record_D_every_x_iterations) % 10 == 0:
                     np.save(save_progress_to + 'W_r={}_it={}.npy'.format(r, it), W[:, :3])
