@@ -5,8 +5,6 @@ import numpy as np
 data_main = "C:/Users/hanne/Documents/PROJECT/Project Data/"
 results_main = "C:/Users/hanne/Documents/PROJECT/Figures/Experiment_2c/"
 
-pd_CM = pd.read_csv(data_main + 'pd_CM.csv', index_col='DLPFC_RNA_Sequencing_Sample_ID')
-
 
 def impute_nan_values(pd, column_to_impute, scz_col, scz_marker, control_marker):
 
@@ -26,56 +24,113 @@ def impute_nan_values(pd, column_to_impute, scz_col, scz_marker, control_marker)
 
     return pd
 
-pd_CM = impute_nan_values(pd_CM, 'pH', 'Dx', 'SCZ', 'Control')
+
+if __name__ == '__main__':
+
+    print('\n\n\n--- CM DATA ---\n')
+
+    pd_CM = pd.read_csv(data_main + 'pd_CM.csv', index_col='DLPFC_RNA_Sequencing_Sample_ID')
+
+    pd_CM = impute_nan_values(pd_CM, 'pH', 'Dx', 'SCZ', 'Control')
+
+    categorical_variables_to_check = ['Gender', 'Ethnicity']
+
+    for variable in categorical_variables_to_check:
+
+        print('\n\n', variable.upper())
+
+        cross_tab = pd.crosstab(pd_CM['Dx'], pd_CM[variable])
+        chi2, p, dof, ex = chi2_contingency(cross_tab)
+        ex = pd.DataFrame(ex, index = cross_tab.index, columns=cross_tab.columns)
+
+        print('\nSample Frequency')
+        print(cross_tab)
+        print('\nExpected Frequencies if Independent')
+        print(ex)
+
+        print('\np-value: ', p)
+
+    print('\n\n')
+    continuous_variables_to_check = ['Age_of_Death', 'PMI_hrs', 'pH', 'DLPFC_RNA_isolation_RIN']
+
+    for variable in continuous_variables_to_check:
+
+        print(variable)
+
+        SCZ_values = pd_CM[pd_CM['Dx'] == 'SCZ'][variable].astype(float)
+        Control_values = pd_CM[pd_CM['Dx'] == 'Control'][variable].astype(float)
+
+        no_SCZ_patients = len(SCZ_values)
+        no_Control_patients = len(Control_values)
+        no_patients = no_Control_patients + no_SCZ_patients
+
+        print('Example SCZ values: ', list(SCZ_values[:10]))
+        print('Example Control values: ', list(Control_values[:10]))
+
+        SCZ_mean = np.mean(SCZ_values)
+        Control_mean = np.mean(Control_values)
+        std = np.std(list(SCZ_values) + list(Control_values))
+        std_mean = std/np.sqrt(no_patients)
+        print('Mean SCZ: ', SCZ_mean)
+        print('Mean Control: ', Control_mean)
+        print('St. Dev: ', std)
+        print('St. Dev. Mean: ', std_mean)
+
+        t_statistic, p_value = ttest_ind(SCZ_values, Control_values, nan_policy='raise')
+
+        print('T statistic: {}, p-value: {}\n'.format(t_statistic, p_value))
 
 
+    # Repetition of analysis, LI data
 
-categorical_variables_to_check = ['Gender', 'Ethnicity']
-
-for variable in categorical_variables_to_check:
-
-    print('\n\n', variable.upper())
-
-    cross_tab = pd.crosstab(pd_CM['Dx'], pd_CM[variable])
-    chi2, p, dof, ex = chi2_contingency(cross_tab)
-    ex = pd.DataFrame(ex, index = cross_tab.index, columns=cross_tab.columns)
-
-    print('\nSample Frequency')
-    print(cross_tab)
-    print('\nExpected Frequencies if Independent')
-    print(ex)
-
-    print('\np-value: ', p)
+    print('\n\n\n\n\n--- LI DATA ---\n')
 
 
-continuous_variables_to_check = ['Age_of_Death', 'PMI_hrs', 'pH', 'DLPFC_RNA_isolation_RIN']
+    pd_LI = pd.read_csv(data_main + 'pd_LI.csv', index_col='RNum')
 
-for variable in continuous_variables_to_check:
+    categorical_variables_to_check = ['Sex', 'Race', 'SmokingEither']
 
-    print(variable)
+    for variable in categorical_variables_to_check:
 
-    SCZ_values = pd_CM[pd_CM['Dx'] == 'SCZ'][variable].astype(float)
-    Control_values = pd_CM[pd_CM['Dx'] == 'Control'][variable].astype(float)
+        print('\n\n', variable.upper())
 
-    no_SCZ_patients = len(SCZ_values)
-    no_Control_patients = len(Control_values)
-    no_patients = no_Control_patients + no_SCZ_patients
+        cross_tab = pd.crosstab(pd_LI['Dx'], pd_LI[variable])
+        chi2, p, dof, ex = chi2_contingency(cross_tab)
+        ex = pd.DataFrame(ex, index = cross_tab.index, columns=cross_tab.columns)
 
-    print('Example SCZ values: ', list(SCZ_values[:10]))
-    print('Example Control values: ', list(Control_values[:10]))
+        print('\nSample Frequency')
+        print(cross_tab)
+        print('\nExpected Frequencies if Independent')
+        print(ex)
 
-    SCZ_mean = np.mean(SCZ_values)
-    Control_mean = np.mean(Control_values)
-    std = np.std(list(SCZ_values) + list(Control_values))
-    std_mean = std/np.sqrt(no_patients)
-    print('Mean SCZ: ', SCZ_mean)
-    print('Mean Control: ', Control_mean)
-    print('St. Dev: ', std)
-    print('St. Dev. Mean: ', std_mean)
+        print('\np-value: ', p)
 
-    t_statistic, p_value = ttest_ind(SCZ_values, Control_values, nan_policy='raise')
+    print('\n\n')
+    continuous_variables_to_check = ['Age', 'PMI', 'RIN']
 
-    print('T statistic: {}, p-value: {}\n'.format(t_statistic, p_value))
+    for variable in continuous_variables_to_check:
 
+        print(variable)
 
+        SCZ_values = pd_LI[pd_LI['Dx'] == 'Schizo'][variable].astype(float)
+        Control_values = pd_LI[pd_LI['Dx'] == 'Control'][variable].astype(float)
 
+        no_SCZ_patients = len(SCZ_values)
+        no_Control_patients = len(Control_values)
+        no_patients = no_Control_patients + no_SCZ_patients
+
+        print('Example SCZ values: ', list(SCZ_values[:10]))
+        print('Example Control values: ', list(Control_values[:10]))
+
+        SCZ_mean = np.mean(SCZ_values)
+        Control_mean = np.mean(Control_values)
+        std = np.std(list(SCZ_values) + list(Control_values))
+        std_mean = std/np.sqrt(no_patients)
+        print('Mean SCZ: ', SCZ_mean)
+        print('Mean Control: ', Control_mean)
+        print('St. Dev: ', std)
+        print('St. Dev. Mean: ', std_mean)
+
+        t_statistic, p_value = ttest_ind(SCZ_values, Control_values, nan_policy='raise')
+
+        print('T statistic: {}, p-value: {}\n'.format(t_statistic, p_value))
