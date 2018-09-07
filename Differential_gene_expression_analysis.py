@@ -1,42 +1,19 @@
-from NMF_divergence import NMF_divergence, save_results
 import pandas as pd
-import numpy as np
-from scipy.stats import ttest_ind
-from analysis_functions_experiment_2 import *
+from final_analysis_and_significance_test import format_confounders_data, complete_significance_test
 
-data_path = "C:/Users/hanne/Documents/PROJECT/Project Data/CM_experiment_2_data.csv"
+CM_data_path = "C:/Users/hanne/Documents/PROJECT/Project Data/CM_experiment_2_data.csv"
+CM_results_path = 'C:/Users/hanne/Documents/PROJECT/Project Data/final_results/DGE_CM/'
+CM_pd_path = "C:/Users/hanne/Documents/PROJECT/Project Data/pd_CM.csv"
+patient_ref_column_CM = 'DLPFC_RNA_Sequencing_Sample_ID'
+confounding_variables_CM = ['Age_of_Death', 'PMI_hrs', 'pH', 'DLPFC_RNA_isolation_RIN']
 
-main_results_folder = "C:/Users/hanne/Documents/PROJECT/Project Data/Experiment_2a_results/"
+confounders_data, case_control_1_0_vector = format_confounders_data(CM_pd_path, patient_ref_column_CM,
+                                                                  confounding_variables_CM, ['pH'], [], 'Dx', 'SCZ',
+                                                                  'Control')
 
-data_matrix = pd.read_csv(data_path, index_col=0)
+bonferroni_correction_factor = pd.read_csv(CM_data_path, index_col=0).shape[0]
+print('Bonferroni correcrion factor:' + str(bonferroni_correction_factor))
 
-genes = list(data_matrix.index)
-patients = list(data_matrix.columns)
-
-n = len(genes)
-m = len(patients)
-
-cases, controls = case_control('CM')
-
-no_significant_genes = 0
-
-for gene_index in range(n):
-    case_values, control_values = case_control_values(data_matrix, gene_index, cases, controls)
-
-    #mean_case =
-
-    t_statistic, p_value = ttest_ind(case_values, control_values, nan_policy='raise')
-    adjusted_p_value = p_value * n
-
-    p_significant = adjusted_p_value <= 0.01
-
-    if p_significant:
-        print('Gene {}/{} - SIGNIFICANT, adjusted p: '.format(gene_index, n) + str(adjusted_p_value))
-
-        no_significant_genes += 1
-
-
-
-
-
-print('\n', no_significant_genes)
+complete_significance_test([CM_data_path], 'CM', 'DGE', bonferroni_correction_factor,
+                           confounders_data, case_control_1_0_vector, confounding_variables_CM, CM_results_path,
+                           t_test_level = 0.01, log_reg_level = 0.05, log_reg_bstrap_tol = 0.025)

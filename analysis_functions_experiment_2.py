@@ -172,7 +172,7 @@ def t_tests(ranks, cases, controls, results_folder, name, p_value_threshold = 0.
 
 
 
-            description = name + ' Rank {}, Metagene {}: p = {} '.format(r, metagene_index, adjusted_p_value)
+            description = name + ' Rank {}, Metagene {}'.format(r, metagene_index)
 
             if p_significant:
                 t_test_results.append([r, metagene_index, t_statistic, mean_control, mean_case, p_value, adjusted_p_value])

@@ -32,7 +32,7 @@ import matplotlib.pyplot as plt
 import math
 
 data_path = "C:/Users/hanne/Documents/PROJECT/Project Data/"
-figures_path = "C:/Users/hanne/Documents/PROJECT/Figures/Experiment_2/"
+figures_path = "C:/Users/hanne/Documents/PROJECT/Figures/"
 
 X_CM = pd.read_csv(data_path + "CM_matrix.csv", index_col=0)
 
@@ -45,7 +45,7 @@ LI_patients = list(X_LI.columns)
 # Plotting a comparative histogram of ALL the elements in the matrices to help decide on floor (and possibly ceiling)
 #  values to apply before log transform
 
-log_transform = True
+log_transform = False
 show_graph = True
 title = 'Distribution of all matrix elements by dataset'
 graph_save_location = figures_path
@@ -82,27 +82,34 @@ elements_below_min(X_LI_elements, base**x_lower_power)
 
 plt.clf()
 
-plt.hist(X_CM_elements, alpha=0.5, label='Common Mind dataset', bins = log_scale_bins(X_CM_elements, no_bins, base),
+lin_bins = np.linspace(0, 30, 100)
+
+plt.hist(X_CM_elements, alpha=0.5, label='Common Mind dataset', bins = lin_bins,#bins = log_scale_bins(X_CM_elements,
+# no_bins,
+# base),
          color='r')
-plt.hist(X_LI_elements, alpha=0.5, label='Lieber Institute dataset', bins = log_scale_bins(X_LI_elements, no_bins, base),
+plt.hist(X_LI_elements, alpha=0.5, label='Lieber Institute dataset', bins = lin_bins,#bins = log_scale_bins(X_LI_elements,
+         # no_bins,
+         # base),
          color = 'g')
 plt.title(title)
 
 
-plt.xlabel('Expression Value')
-plt.xscale('log', basex = base)
-plt.xlim(base**(x_lower_power -1), base**(x_higher_power + 1))
-
-plt.xticks([base**x for x in list(range(x_lower_power, x_higher_power+1, tick_interval))])
+plt.xlabel('Expression Value/RPKM')
+# plt.xscale('log', basex = base)
+# plt.xlim(base**(x_lower_power -1), base**(x_higher_power + 1))
+#
+# plt.xticks([base**x for x in list(range(x_lower_power, x_higher_power+1, tick_interval))])
 
 plt.ylabel('Frequency')
 plt.legend()
 
+plt.ylim((0, 2e6))
 
-plt.show()
 plt.savefig(graph_save_location + title + '.png', dpi = 500)
+plt.show()
 
-
+input()
 
 
 
@@ -142,8 +149,8 @@ def preprocess(data_matrix, sparsity_cut_off, floor_threshold):
 CM_preprocessed = preprocess(X_CM, 30, 2**-10)
 LI_preprocessed = preprocess(X_LI, 30, 2**-10)
 
-CM_preprocessed.to_csv(data_path + 'CM_experiment_2_data.csv')
-LI_preprocessed.to_csv(data_path + 'LI_experiment_2_data.csv')
+# CM_preprocessed.to_csv(data_path + 'CM_experiment_2_data.csv')
+# LI_preprocessed.to_csv(data_path + 'LI_experiment_2_data.csv')
 
 
 

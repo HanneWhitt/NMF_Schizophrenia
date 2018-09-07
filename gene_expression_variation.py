@@ -16,17 +16,26 @@ figures_path = "C:/Users/hanne/Documents/PROJECT/Figures/"
 X_CM = pd.read_csv(data_path + "CM_matrix.csv", index_col=0)
 X_LI = pd.read_csv(data_path + "LI_matrix.csv", index_col=0)
 
+print(X_CM.shape, X_LI.shape)
+
+input()
+
 CM_patients = list(X_CM.columns)
 LI_patients = list(X_LI.columns)
 
 X = pd.concat([X_CM, X_LI], axis = 1)
 del X_LI, X_CM
 
+n_genes = X.shape[0]
+m_patients = X.shape[1]
+
+
 # Removing genes which register zero expression for all patients
 X = X[(X != 0).any(1)]
 
 n_genes = X.shape[0]
 m_patients = X.shape[1]
+
 
 # Calculating means, standard deviations, coefficients of variation for each gene
 X_gene_stats = pd.DataFrame()
@@ -131,7 +140,7 @@ plt.xscale('log')
 genes_left = X_gene_stats.shape[0]
 for bin_size, bin, patch in zip(N, bins, patches):
     genes_left -= bin_size
-    if genes_left <= cut_off_for_included_data:
+    if genes_left > cut_off_for_included_data:
         patch.set_facecolor("#FF0000")
 
 plt.title('Frequency of Genes in Dataset by\nCoefficient of Variation in Expression Values')
@@ -144,12 +153,12 @@ plt.savefig(figures_path + 'CoV Histogram without excluded sparse genes.png', dp
 
 plt.show()
 
-
+input()
 # Selecting top 15000 genes from remaining genes by coefficient of variation for first NMF and saving
 X_gene_stats = X_gene_stats.sort_values('CoV', ascending=False)
 X_gene_stats = X_gene_stats.iloc[:15000, :]
 X_experiment_1 = X.loc[X_gene_stats.index]
-X_experiment_1.to_csv(data_path + 'Experiment_1_Data.csv')
+#X_experiment_1.to_csv(data_path + 'Experiment_1_Data.csv')
 
 # A function to randomly permute the columns of the dataset as in Frigyesi et al. 2008
 def permute_columns(matrix_dataframe):
@@ -158,7 +167,7 @@ def permute_columns(matrix_dataframe):
     return matrix_dataframe
 
 X_experiment_1_columns_permuted = permute_columns(X_experiment_1)
-X_experiment_1_columns_permuted.to_csv(data_path + 'Experiment_1_Data_columns_permuted.csv')
+#X_experiment_1_columns_permuted.to_csv(data_path + 'Experiment_1_Data_columns_permuted.csv')
 
 
 

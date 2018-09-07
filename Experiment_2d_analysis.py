@@ -34,23 +34,23 @@ if __name__ == "__main__":
     bonferroni_correction_factor = sum(ranks)
 
     # exp_2d_CM
-    # data_main = 'C:/Users/hanne/Documents/PROJECT/Project Data/'
-    # CM_data_path = data_main + 'Experiment_2d_results/CM/'
-    # CM_results_path = 'C:/Users/hanne/Documents/PROJECT/Project Data/final_results/exp2d_CM/'
-    # CM_pd_path = "C:/Users/hanne/Documents/PROJECT/Project Data/pd_CM.csv"
-    # patient_ref_column_CM = 'DLPFC_RNA_Sequencing_Sample_ID'
-    # confounding_variables_CM = ['Age_of_Death', 'PMI_hrs', 'pH', 'DLPFC_RNA_isolation_RIN']
-    #
-    # CM_best_repeats, CM_H_csv_list, CM_W_csv_list = find_best_repeats(CM_data_path, ranks, repeats)
-    #
-    # confounders_data, case_control_1_0_vector = format_confounders_data(CM_pd_path, patient_ref_column_CM,
-    #                                                                   confounding_variables_CM, ['pH'], [], 'Dx', 'SCZ',
-    #                                                                   'Control')
-    #
-    # complete_significance_test(CM_H_csv_list, 'CM', 'exp2d', bonferroni_correction_factor,
-    #                            confounders_data, case_control_1_0_vector, confounding_variables_CM, CM_results_path,
-    #                            list_of_W_csvs=CM_W_csv_list, t_test_level = 0.01, log_reg_level = 0.05,
-    #                            log_reg_bstrap_tol = 0.005)
+    data_main = 'C:/Users/hanne/Documents/PROJECT/Project Data/'
+    CM_data_path = data_main + 'Experiment_2d_results/CM/'
+    CM_results_path = 'C:/Users/hanne/Documents/PROJECT/Project Data/final_results/exp2d_CM/'
+    CM_pd_path = "C:/Users/hanne/Documents/PROJECT/Project Data/pd_CM.csv"
+    patient_ref_column_CM = 'DLPFC_RNA_Sequencing_Sample_ID'
+    confounding_variables_CM = ['Age_of_Death', 'PMI_hrs', 'pH', 'DLPFC_RNA_isolation_RIN']
+
+    CM_best_repeats, CM_H_csv_list, CM_W_csv_list = find_best_repeats(CM_data_path, ranks, repeats)
+
+    confounders_data, case_control_1_0_vector = format_confounders_data(CM_pd_path, patient_ref_column_CM,
+                                                                      confounding_variables_CM, ['pH'], [], 'Dx', 'SCZ',
+                                                                      'Control')
+
+    complete_significance_test(CM_H_csv_list, 'CM', 'exp2d', bonferroni_correction_factor,
+                               confounders_data, case_control_1_0_vector, confounding_variables_CM, CM_results_path,
+                               list_of_W_csvs=CM_W_csv_list, t_test_level = 0.01, log_reg_level = 0.05,
+                               log_reg_bstrap_tol = 0.005)
 
 
     # # exp_2d_LI

@@ -204,7 +204,7 @@ if __name__ == '__main__':
 
     bonferroni_correction_factor = sum([5, 8, 10, 12, 15, 18, 20, 25, 30, 40, 50, 60, 70, 80, 100, 150])
 
-    complete_significance_test(H_csv_list, 'LI', 'exp2c', bonferroni_correction_factor,
-                               confounders_data, case_control_1_0_vector, confounding_variables_LI, results_path,
-                               list_of_W_csvs=W_csv_list, t_test_level=0.01, log_reg_level=0.05,
-                               log_reg_bstrap_tol=0.005)
+    # complete_significance_test(H_csv_list, 'LI', 'exp2c', bonferroni_correction_factor,
+    #                            confounders_data, case_control_1_0_vector, confounding_variables_LI, results_path,
+    #                            list_of_W_csvs=W_csv_list, t_test_level=0.01, log_reg_level=0.05,
+    #                            log_reg_bstrap_tol=0.005)

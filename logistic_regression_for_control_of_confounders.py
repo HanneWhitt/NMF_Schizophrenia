@@ -40,7 +40,7 @@ def logistic_regression(X, y, max_iterations = 1000, b_init = None, fisher_info_
 
         b += del_b
 
-        if np.max(del_b/b) < 1e-7:
+        if np.max(np.abs(del_b/b)) < 1e-7:
             if report_progress:
                 print('Newton Raphson converged after {} iterations'.format(it + 1))
             break
@@ -222,7 +222,7 @@ if __name__ == '__main__':
     plt.xlabel('Variable 1')
     plt.ylabel('Variable 2')
     plt.title(title)
-    plt.savefig(figures_path + title + '.png', dpi = 500)
+    #plt.savefig(figures_path + title + '.png', dpi = 500)
 
 
     # Testing code against sklearn
@@ -230,6 +230,12 @@ if __name__ == '__main__':
     sklearn_model = LogisticRegression(C = 1e100, solver = 'newton-cg', tol = 1e-100)
     sklearn_model = sklearn_model.fit(X_test, y_test)
     sk_time = time() - start_sk
+
+    pc_list = b.flatten()
+    sklist = np.array(list(sklearn_model.coef_.flatten()) + (list(sklearn_model.intercept_)))
+
+    print(pc_list - sklist)
+
 
     print('Project code coefficients: ', b.flatten())
     print('Project code time: ', pc_time)
@@ -241,9 +247,9 @@ if __name__ == '__main__':
     coefficient_names = ['Variable 1', 'Variable 2', 'Intercept']
 
     pc_bs_start = time()
-    results, er_rec = log_reg_with_bootstrap(X_test, y_test, coefficient_names, save_loc=figures_path,
-                                            save_name = 'Results logistic regression with bootsrapping on random '
-                                                        'data.csv')
+    results, er_rec = log_reg_with_bootstrap(X_test, y_test, coefficient_names)#, save_loc=figures_path,
+                                            # save_name = 'Results logistic regression with bootsrapping on random '
+                                            #             'data.csv')
     bs_time = time() - pc_bs_start
 
 
@@ -258,4 +264,4 @@ if __name__ == '__main__':
 
     # Plotting graphs to show how error estimate of bootstrap varies with number of random samples - important to
     # check that bootstrap error estimate is stable to accuracy required.
-    bootstrap_error_vs_iterations(er_rec, coefficient_names, save_loc=figures_path, show_graph=True)
+    #bootstrap_error_vs_iterations(er_rec, coefficient_names, save_loc=figures_path, show_graph=True)

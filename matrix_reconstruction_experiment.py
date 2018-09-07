@@ -48,6 +48,7 @@ def plot_divergence_by_iteration(divergence_vector, title):
     plt.title(title)
     plt.xlabel('Iteration number')
     plt.ylabel('Divergence')
+    plt.xlim((0, 10))
     div_start = divergence_vector[0]
     div_end = divergence_vector[-1]
     text_x = 200
@@ -59,6 +60,21 @@ def plot_divergence_by_iteration(divergence_vector, title):
 error_stats_columns = ['MEAN ABS PC', 'MEAN ABS SK', 'MAX ABS PC', 'MAX ABS SK', 'MEAN REL PC', 'MEAN REL SK',
                        'MAX REL PC', 'MAX REL SK', 'TIME PC', 'TIME SK', 'NO. ELEMENTS']
 
+def format_for_latex(matrix, round_or_not):
+
+    row_list = []
+    for row_ind in range(matrix.shape[0]):
+        row = list(matrix[row_ind, :])
+        if round_or_not:
+            row = [str(round(elmt, 2)) for elmt in row]
+        else:
+            row = [str(int(elmt)) for elmt in row]
+        row = ' & '.join(row)
+        row_list.append(row)
+
+    matrix_string = ' \\\\ '.join(row_list)
+
+    print(matrix_string)
 
 def check_NMF_reconstruction(V_test, W_init, H_init, n, m, r, iterations):
 
@@ -66,8 +82,19 @@ def check_NMF_reconstruction(V_test, W_init, H_init, n, m, r, iterations):
     pc_start = time.time()
     W_pc, H_pc, convergence_record = project_code_NMF(V_test, W_init, H_init, n, m, r, iterations,
                                                       record_D_every_x_iterations = 10)
+
+
+
     pc_time = time.time() - pc_start
     V_pc = np.matmul(W_pc, H_pc)
+
+    # if n == m == 4 and r == 2:
+    #     format_for_latex(W_pc, 1)
+    #     format_for_latex(H_pc, 1)
+    #     format_for_latex(V_pc, 1)
+    #     print(convergence_record)
+    #     plot_divergence_by_iteration(list(convergence_record[1]), 'Convergence of dummy matrix test, G = P = 4, R = 2')
+    #     input()
 
     # Carrying out NMF using scikit-learn
     sk_start = time.time()
@@ -77,6 +104,8 @@ def check_NMF_reconstruction(V_test, W_init, H_init, n, m, r, iterations):
     H_sklearn = model.components_
     sk_time = time.time() - sk_start
     V_sklearn = np.matmul(W_sklearn, H_sklearn)
+
+    diff_avg = np.max(np.abs(V_sklearn  - V_pc))
 
     # Calculating/viewing reconstruction error statistics
     pc_av_abs, pc_max_abs, pc_av_rel, pc_max_rel = get_error_statistics(V_test, V_pc)
@@ -89,14 +118,18 @@ def check_NMF_reconstruction(V_test, W_init, H_init, n, m, r, iterations):
                            columns = error_stats_columns,
                            index = ['n={}, m={}, r={}'.format(n, m, r)])
 
-    return results
+    return results, diff_avg
 
 
 full_results = pd.DataFrame(columns=error_stats_columns)
 
+diffavgs = []
+
 for n in range(2, n_m_max + 1):
     for m in range(2, n_m_max + 1):
         for r in range(2, min([n, m])):
+
+
 
 
             print('n = {}, m = {}, r = {}...'.format(n, m, r))
@@ -109,21 +142,36 @@ for n in range(2, n_m_max + 1):
 
             V_test = np.matmul(W_test, H_test)
 
-            results = check_NMF_reconstruction(V_test, W_init, H_init, n, m, r, max_iterations)
+            # if n == m == 4 and r == 2:
+            #     format_for_latex(W_test, 0)
+            #     format_for_latex(H_test, 0)
+            #     format_for_latex(V_test, 0)
 
+
+            results, diff_avg = check_NMF_reconstruction(V_test, W_init, H_init, n, m, r, max_iterations)
+
+            diffavgs.append(diff_avg)
             full_results = full_results.append(results)
 
 
+print(np.max(diffavgs))
+
 #full_results.to_csv(results_folder + 'full_results.csv')
 
-overall_average_relative_reconstruction_error_pc = full_results['MEAN REL PC'].mean()
+overall_average_relative_reconstruction_error_pc = full_results['MEAN ABS PC'].mean()
 print('overall_average_relative_reconstruction_error_pc ', overall_average_relative_reconstruction_error_pc)
 
-max_average_relative_reconstruction_error_pc = full_results['MEAN REL PC'].max()
+max_average_relative_reconstruction_error_pc = full_results['MEAN ABS PC'].max()
 print('max_average_relative_reconstruction_error_pc ', max_average_relative_reconstruction_error_pc)
 
-pc_outperforms = np.sum(np.where(full_results['MEAN REL PC'] < full_results['MEAN REL SK'], 1, 0))
-pc_matches = np.sum(np.where(full_results['MEAN REL PC'] == full_results['MEAN REL SK'], 1, 0))
+overall_average_relative_reconstruction_error_pc = full_results['MEAN ABS SK'].mean()
+print('overall_average_relative_reconstruction_error_sk ', overall_average_relative_reconstruction_error_pc)
+
+max_average_relative_reconstruction_error_pc = full_results['MEAN ABS SK'].max()
+print('max_average_relative_reconstruction_error_sk ', max_average_relative_reconstruction_error_pc)
+
+pc_outperforms = np.sum(np.where(full_results['MEAN ABS PC'] < full_results['MEAN ABS SK'], 1, 0))
+pc_matches = np.sum(np.where(full_results['MEAN ABS PC'] == full_results['MEAN ABS SK'], 1, 0))
 
 pc_matches_or_outperforms_proportion = (pc_matches + pc_outperforms)/204
 print('pc_matches_or_outperforms_proportion ', pc_matches_or_outperforms_proportion)

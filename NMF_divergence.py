@@ -39,7 +39,7 @@ def D(V_real, V_approx):  # V_true, V_approx are any two matrices (np arrays) of
 def W_update(Vw, Ww, Hw, n, m, r):
     assert Vw.shape == (n, m) and Ww.shape == (n, r) and Hw.shape == (r, m), "Matrix dimensions wrong"
 
-    WHw = make_safe(np.matmul(Ww, Hw))
+    WHw = make_safe(np.matmul(Ww, Hw)) # Preventing zero division errors
     divw = np.divide(Vw, WHw)
 
     numeratorw = np.matmul(divw, np.transpose(Hw))
@@ -54,7 +54,7 @@ def W_update(Vw, Ww, Hw, n, m, r):
 def H_update(Vh, Wh, Hh, n, m, r):
     assert Vh.shape == (n, m) and Wh.shape == (n, r) and Hh.shape == (r, m), "Matrix dimensions wrong"
 
-    WHh = make_safe(np.matmul(Wh, Hh))
+    WHh = make_safe(np.matmul(Wh, Hh)) # Preventing zero division errors
     divh = np.divide(Vh, WHh)
 
     numeratorh = np.matmul(np.transpose(Wh), divh)

@@ -62,7 +62,7 @@ if __name__ == "__main__":
     #     experiment_2d([100, 150], iterations, CM_rpkm_matrix_path, CM_genes_with_GO_annotations, CM_results_folder,
     #                   repeat)
 
-    ranks = [5, 8, 10, 12, 15, 18, 20, 25, 30, 40, 50, 60, 70, 80, 100, 150]
+    ranks = [10, 12, 15, 18, 20, 25, 30, 40, 50, 60]
 
     # for repeat in range(2, 10):
     #     experiment_2d(ranks, iterations, CM_rpkm_matrix_path, CM_genes_with_GO_annotations, CM_results_folder, repeat)

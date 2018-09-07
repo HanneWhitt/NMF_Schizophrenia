@@ -20,8 +20,22 @@ for r in [5, 10, 20, 50, 100]:
 
     conv_graph_title = 'Convergence from alternative Initialization Methods - Rank ' + str(r)
 
-    conv_data = convergence_data(label_to_csv_dict, show_graph=False, title=conv_graph_title,
-                                 it_range = (0, 500), loss_range = (2e6, 4e6))
+    if r == 5:
+
+        conv_data = convergence_data(label_to_csv_dict, show_graph=False, graph_save_location=figures_save_loc,
+                                     title=conv_graph_title, log_scale= False,
+                                     it_range = (0, 1000), loss_range = (2.25e6, 3.25e6))
+    elif r == 100:
+        conv_data = convergence_data(label_to_csv_dict, show_graph=False, graph_save_location=figures_save_loc,
+                                     title=conv_graph_title, log_scale= False,
+                                     it_range=(0, 5000), loss_range=(1.25e6, 2.75e6))
+
+    else:
+
+        conv_data = convergence_data(label_to_csv_dict, show_graph=False, graph_save_location=figures_save_loc,
+                                     title=conv_graph_title, log_scale=False,
+                                     it_range=(0, 500), loss_range=(2e6, 4e6))
+
     print(conv_data)
 
     divergence_at_5000[str(r)] = conv_data.iloc[4999,:]
@@ -46,11 +60,12 @@ cases, controls = case_control('CM')
 
 # Applying t-tests to results from random initialization (Experiment 2a)
 
-ranks_exp_2a = [2, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 100, 150]
-
-t_test_results = t_tests(ranks_exp_2a, cases, controls, results_2a, name = 'Random Initialisation')
-
-
+# ranks_exp_2a = [2, 5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 100, 150]
+#
+# t_test_results = t_tests(ranks_exp_2a, cases, controls, results_2a, name = 'Experiment 2a,',
+#                          plot_comparative_hists=True, save_comparative_hists_to=figures_save_loc)
+#
+#
 
 
 # for exp_name, exp_path in exps_dict.items():

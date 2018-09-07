@@ -48,6 +48,7 @@ if __name__ == '__main__':
         print('\nExpected Frequencies if Independent')
         print(ex)
 
+        print('\nchi2-value: ', chi2)
         print('\np-value: ', p)
 
     print('\n\n')
@@ -103,6 +104,7 @@ if __name__ == '__main__':
         print('\nExpected Frequencies if Independent')
         print(ex)
 
+        print('\nchi2-value: ', chi2)
         print('\np-value: ', p)
 
     print('\n\n')
